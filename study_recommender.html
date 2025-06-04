@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StudyNext - Your Personalized Study Guide</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #333;
+        }
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .form-section {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #555;
+        }
+        input, select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        input:focus, select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        .grade-inputs {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+        .btn {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 18px;
+            cursor: pointer;
+            transition: transform 0.3s;
+            width: 100%;
+            margin-top: 20px;
+        }
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+        .results {
+            margin-top: 30px;
+            display: none;
+        }
+        .recommendation {
+            background: #fff;
+            border-left: 5px solid #667eea;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        }
+        .priority-high { border-left-color: #e74c3c; }
+        .priority-med { border-left-color: #f39c12; }
+        .priority-low { border-left-color: #27ae60; }
+        .resource-link {
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            padding: 8px 16px;
+            text-decoration: none;
+            border-radius: 5px;
+            margin: 5px 5px 5px 0;
+            transition: background 0.3s;
+        }
+        .resource-link:hover {
+            background: #5a6fd8;
+        }
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        .stat-card {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        .stat-value {
+            font-size: 2em;
+            font-weight: bold;
+            color: #667eea;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📚 StudyNext</h1>
+            <p>Get personalized study recommendations based on your grades</p>
+        </div>
+
+        <div class="form-section">
+            <h3>📊 Enter Your Grades</h3>
+            <div class="grade-inputs">
+                <div class="form-group">
+                    <label>Math Grade (%)</label>
+                    <input type="number" id="math" min="0" max="100" placeholder="85">
+                </div>
+                <div class="form-group">
+                    <label>Science Grade (%)</label>
+                    <input type="number" id="science" min="0" max="100" placeholder="78">
+                </div>
+                <div class="form-group">
+                    <label>English Grade (%)</label>
+                    <input type="number" id="english" min="0" max="100" placeholder="92">
+                </div>
+                <div class="form-group">
+                    <label>History Grade (%)</label>
+                    <input type="number" id="history" min="0" max="100" placeholder="88">
+                </div>
+            </div>
+        </div>
+
+        <div class="form-section">
+            <h3>🎯 Additional Info</h3>
+            <div class="form-group">
+                <label>Grade Level</label>
+                <select id="gradeLevel">
+                    <option value="middle">Middle School (6-8)</option>
+                    <option value="high">High School (9-12)</option>
+                    <option value="college">College/University</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Study Time Available (hours/day)</label>
+                <input type="number" id="studyTime" min="0.5" max="8" step="0.5" placeholder="2">
+            </div>
+        </div>
+
+        <button class="btn" onclick="generateRecommendations()">
+            🚀 Get My Study Plan
+        </button>
+
+        <div id="results" class="results">
+            <div class="stats" id="stats"></div>
+            <div id="recommendations"></div>
+        </div>
+    </div>
+
+    <script>
+        const studyResources = {
+            math: {
+                low: [
+                    { name: "Khan Academy - Basic Math", url: "https://www.khanacademy.org/math/basic-math" },
+                    { name: "Professor Leonard - Algebra", url: "https://www.youtube.com/c/ProfessorLeonard" },
+                    { name: "Mathway Problem Solver", url: "https://www.mathway.com/" }
+                ],
+                med: [
+                    { name: "Khan Academy - Algebra", url: "https://www.khanacademy.org/math/algebra" },
+                    { name: "PatrickJMT Math Videos", url: "https://www.youtube.com/user/patrickJMT" },
+                    { name: "Wolfram Alpha", url: "https://www.wolframalpha.com/" }
+                ],
+                high: [
+                    { name: "Khan Academy - Calculus", url: "https://www.khanacademy.org/math/calculus-1" },
+                    { name: "MIT OpenCourseWare Math", url: "https://ocw.mit.edu/courses/mathematics/" },
+                    { name: "3Blue1Brown", url: "https://www.youtube.com/c/3blue1brown" }
+                ]
+            },
+            science: {
+                low: [
+                    { name: "Khan Academy - Basic Science", url: "https://www.khanacademy.org/science" },
+                    { name: "Crash Course Science", url: "https://www.youtube.com/c/crashcourse" },
+                    { name: "NASA Education", url: "https://www.nasa.gov/audience/foreducators/" }
+                ],
+                med: [
+                    { name: "Khan Academy - Chemistry", url: "https://www.khanacademy.org/science/chemistry" },
+                    { name: "MIT OpenCourseWare Science", url: "https://ocw.mit.edu/courses/find-by-topic/" },
+                    { name: "Coursera Science Courses", url: "https://www.coursera.org/browse/physical-science-engineering" }
+                ],
+                high: [
+                    { name: "edX Science Courses", url: "https://www.edx.org/course/subject/science" },
+                    { name: "Khan Academy - AP Physics", url: "https://www.khanacademy.org/science/ap-physics-1" },
+                    { name: "Feynman Lectures", url: "https://www.feynmanlectures.caltech.edu/" }
+                ]
+            },
+            english: {
+                low: [
+                    { name: "Khan Academy - Grammar", url: "https://www.khanacademy.org/humanities/grammar" },
+                    { name: "Purdue OWL Writing Lab", url: "https://owl.purdue.edu/owl/purdue_owl.html" },
+                    { name: "Grammarly Blog", url: "https://www.grammarly.com/blog/" }
+                ],
+                med: [
+                    { name: "Khan Academy - Reading", url: "https://www.khanacademy.org/humanities/reading-comprehension" },
+                    { name: "Coursera Writing Courses", url: "https://www.coursera.org/browse/language-learning/learning-english" },
+                    { name: "TED-Ed Literature", url: "https://ed.ted.com/lessons?category=literature-language-arts" }
+                ],
+                high: [
+                    { name: "Yale Open Courses Literature", url: "https://oyc.yale.edu/english" },
+                    { name: "MIT Writing Course", url: "https://ocw.mit.edu/courses/comparative-media-studies-writing/" },
+                    { name: "Project Gutenberg", url: "https://www.gutenberg.org/" }
+                ]
+            },
+            history: {
+                low: [
+                    { name: "Khan Academy - World History", url: "https://www.khanacademy.org/humanities/world-history" },
+                    { name: "Crash Course World History", url: "https://www.youtube.com/playlist?list=PLBDA2E52FB1EF80C9" },
+                    { name: "BBC History for Kids", url: "https://www.bbc.co.uk/bitesize/subjects/zk26n39" }
+                ],
+                med: [
+                    { name: "Khan Academy - US History", url: "https://www.khanacademy.org/humanities/us-history" },
+                    { name: "Stanford History Education", url: "https://sheg.stanford.edu/" },
+                    { name: "Coursera History Courses", url: "https://www.coursera.org/browse/arts-and-humanities/history" }
+                ],
+                high: [
+                    { name: "Yale Open Courses History", url: "https://oyc.yale.edu/history" },
+                    { name: "MIT History Courses", url: "https://ocw.mit.edu/courses/history/" },
+                    { name: "Library of Congress", url: "https://www.loc.gov/teachers/" }
+                ]
+            }
+        };
+
+        function generateRecommendations() {
+            const grades = {
+                math: parseInt(document.getElementById('math').value) || 0,
+                science: parseInt(document.getElementById('science').value) || 0,
+                english: parseInt(document.getElementById('english').value) || 0,
+                history: parseInt(document.getElementById('history').value) || 0
+            };
+
+            const gradeLevel = document.getElementById('gradeLevel').value;
+            const studyTime = parseFloat(document.getElementById('studyTime').value) || 1;
+
+            // Calculate priorities and recommendations
+            const subjects = Object.keys(grades);
+            const recommendations = [];
+
+            subjects.forEach(subject => {
+                const grade = grades[subject];
+                let priority, level, message;
+
+                if (grade < 70) {
+                    priority = 'high';
+                    level = 'low';
+                    message = `📍 URGENT: ${subject.charAt(0).toUpperCase() + subject.slice(1)} needs immediate attention. Focus on fundamentals.`;
+                } else if (grade < 85) {
+                    priority = 'med';
+                    level = 'med';
+                    message = `⚠️ MODERATE: ${subject.charAt(0).toUpperCase() + subject.slice(1)} has room for improvement. Strengthen your understanding.`;
+                } else {
+                    priority = 'low';
+                    level = 'high';
+                    message = `✅ STRONG: ${subject.charAt(0).toUpperCase() + subject.slice(1)} is going well. Challenge yourself with advanced topics.`;
+                }
+
+                recommendations.push({
+                    subject,
+                    grade,
+                    priority,
+                    level,
+                    message,
+                    resources: studyResources[subject][level]
+                });
+            });
+
+            // Sort by priority (high first)
+            recommendations.sort((a, b) => {
+                const priorityOrder = { 'high': 3, 'med': 2, 'low': 1 };
+                return priorityOrder[b.priority] - priorityOrder[a.priority];
+            });
+
+            displayResults(recommendations, grades, studyTime);
+        }
+
+        function displayResults(recommendations, grades, studyTime) {
+            const resultsDiv = document.getElementById('results');
+            const statsDiv = document.getElementById('stats');
+            const recommendationsDiv = document.getElementById('recommendations');
+
+            // Calculate stats
+            const average = Object.values(grades).reduce((a, b) => a + b, 0) / 4;
+            const lowest = Math.min(...Object.values(grades));
+            const highest = Math.max(...Object.values(grades));
+
+            // Display stats
+            statsDiv.innerHTML = `
+                <div class="stat-card">
+                    <div class="stat-value">${average.toFixed(1)}%</div>
+                    <div>Average Grade</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">${lowest}%</div>
+                    <div>Lowest Grade</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">${highest}%</div>
+                    <div>Highest Grade</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">${studyTime}h</div>
+                    <div>Daily Study Time</div>
+                </div>
+            `;
+
+            // Display recommendations
+            recommendationsDiv.innerHTML = recommendations.map(rec => `
+                <div class="recommendation priority-${rec.priority}">
+                    <h3>${rec.message}</h3>
+                    <p><strong>Current Grade:</strong> ${rec.grade}% | <strong>Priority:</strong> ${rec.priority.toUpperCase()}</p>
+                    <p><strong>📚 Recommended Resources:</strong></p>
+                    <div>
+                        ${rec.resources.map(resource => 
+                            `<a href="${resource.url}" target="_blank" class="resource-link">${resource.name}</a>`
+                        ).join('')}
+                    </div>
+                </div>
+            `).join('');
+
+            resultsDiv.style.display = 'block';
+            resultsDiv.scrollIntoView({ behavior: 'smooth' });
+        }
+    </script>
+</body>
+</html>
