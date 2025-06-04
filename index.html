@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StudyNext - Material Design</title>
+    <style>
+        * { 
+            margin: 0; 
+            padding: 0; 
+            box-sizing: border-box; 
+        }
+        
+        body { 
+            font-family: 'Roboto', sans-serif;
+            background: #fafafa;
+            color: #212121;
+            line-height: 1.5;
+        }
+        
+        .app-bar {
+            background: #2196F3;
+            color: white;
+            padding: 16px 24px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+        }
+        
+        .app-bar h1 {
+            font-size: 20px;
+            font-weight: 500;
+            margin: 0;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 80px 16px 16px;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 2px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 16px;
+            overflow: hidden;
+        }
+        
+        .card-header {
+            padding: 16px 24px;
+            background: #f5f5f5;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .card-header h2 {
+            font-size: 18px;
+            font-weight: 500;
+            color: #212121;
+            margin: 0;
+        }
+        
+        .card-content {
+            padding: 24px;
+        }
+        
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        
+        .input-group {
+            position: relative;
+        }
+        
+        .input-field {
+            width: 100%;
+            padding: 12px 16px;
+            border: none;
+            border-bottom: 2px solid #e0e0e0;
+            background: transparent;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        
+        .input-field:focus {
+            outline: none;
+            border-bottom-color: #2196F3;
+        }
+        
+        .input-label {
+            position: absolute;
+            left: 16px;
+            top: 12px;
+            font-size: 16px;
+            color: #757575;
+            transition: all 0.3s;
+            pointer-events: none;
+        }
+        
+        .input-field:focus + .input-label,
+        .input-field:not(:placeholder-shown) + .input-label {
+            top: -8px;
+            font-size: 12px;
+            color: #2196F3;
+        }
+        
+        .select-field {
+            width: 100%;
+            padding: 12px 16px;
+            border: none;
+            border-bottom: 2px solid #e0e0e0;
+            background: transparent;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        
+        .select-field:focus {
+            outline: none;
+            border-bottom-color: #2196F3;
+        }
+        
+        .fab {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: #FF4081;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+            transition: all 0.3s;
+            z-index: 1000;
+        }
+        
+        .fab:hover {
+            box-shadow: 0 6px 12px rgba(0,0,0,0.4);
+            transform: scale(1.1);
+        }
+        
+        .button-primary {
+            background: #2196F3;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 2px;
+            font-size: 14px;
+            font-weight: 500;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: background 0.3s;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        
+        .button-primary:hover {
+            background: #1976D2;
+        }
+        
+        .button-primary:disabled {
+            background: #e0e0e0;
+            color: #9e9e9e;
+            cursor: not-allowed;
+        }
+        
+        .results {
+            display: none;
+            animation: slideIn 0.3s ease-out;
+        }
+        
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 16px;
+            text-align: center;
+            border-radius: 2px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .stat-value {
+            font-size: 32px;
+            font-weight: 300;
+            color: #2196F3;
+            margin-bottom: 4px;
+        }
+        
+        .stat-label {
+            font-size: 12px;
+            color: #757575;
+            text-transform: uppercase;
+        }
+        
+        .recommendation-card {
+            background: white;
+            border-radius: 2px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 16px;
+            overflow: hidden;
+        }
+        
+        .rec-header {
+            padding: 16px 24px;
+            color: white;
+        }
+        
+        .rec-header.priority-high { background: #F44336; }
+        .rec-header.priority-med { background: #FF9800; }
+        .rec-header.priority-low { background: #4CAF50; }
+        
+        .rec-content {
+            padding: 24px;
+        }
+        
+        .resource-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 16px;
+        }
+        
+        .chip {
+            background: #e3f2fd;
+            color: #1976d2;
+            padding: 8px 12px;
+            border-radius: 16px;
+            font-size: 12px;
+            text-decoration: none;
+            transition: background 0.3s;
+        }
+        
+        .chip:hover {
+            background: #bbdefb;
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 24px;
+        }
+        
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #e0e0e0;
+            border-top: 4px solid #2196F3;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 16px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .snackbar {
+            position: fixed;
+            bottom: 24px;
+            left: 24px;
+            background: #323232;
+            color: white;
+            padding: 16px 24px;
+            border-radius: 2px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+            transform: translateY(100px);
+            transition: transform 0.3s;
+            z-index: 1001;
+        }
+        
+        .snackbar.show {
+            transform: translateY(0);
+        }
+        
+        .progress-bar {
+            height: 4px;
+            background: #e0e0e0;
+            border-radius: 2px;
+            overflow: hidden;
+            margin-top: 8px;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: #2196F3;
+            transition: width 0.3s;
+        }
+        
+        @media (max-width: 600px) {
+            .container {
+                padding: 80px 8px 8px;
+            }
+            
+            .card-content {
+                padding: 16px;
+            }
+            
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-bar">
+        <h1>NextUp</h1>
+    </div>
+
+    <div class="container">
+        <div class="card">
+            <div class="card-header">
+                <h2>Enter Your Grades</h2>
+            </div>
+            <div class="card-content">
+                <div class="form-grid">
+                    <div class="input-group">
+                        <input type="number" id="math" class="input-field" min="0" max="100" placeholder=" ">
+                        <label class="input-label">Math Grade (%)</label>
+                    </div>
+                    <div class="input-group">
+                        <input type="number" id="science" class="input-field" min="0" max="100" placeholder=" ">
+                        <label class="input-label">Science Grade (%)</label>
+                    </div>
+                    <div class="input-group">
+                        <input type="number" id="english" class="input-field" min="0" max="100" placeholder=" ">
+                        <label class="input-label">English Grade (%)</label>
+                    </div>
+                    <div class="input-group">
+                        <input type="number" id="history" class="input-field" min="0" max="100" placeholder=" ">
+                        <label class="input-label">History Grade (%)</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h2>Study Preferences</h2>
+            </div>
+            <div class="card-content">
+                <div class="form-grid">
+                    <div class="input-group">
+                        <select id="gradeLevel" class="select-field">
+                            <option value="middle">Middle School (6-8)</option>
+                            <option value="high">High School (9-12)</option>
+                            <option value="college">College/University</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <input type="number" id="studyTime" class="input-field" min="0.5" max="8" step="0.5" placeholder=" ">
+                        <label class="input-label">Study Time (hours/day)</label>
+                    </div>
+                </div>
+                <button class="button-primary" onclick="generateRecommendations()" id="generateBtn">
+                    Generate Study Plan
+                </button>
+            </div>
+        </div>
+
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p>Finding the best resources for you...</p>
+        </div>
+
+        <div id="results" class="results">
+            <div class="card">
+                <div class="card-header">
+                    <h2>📈 Your Study Analytics</h2>
+                </div>
+                <div class="card-content">
+                    <div class="stats-grid" id="statsGrid"></div>
+                </div>
+            </div>
+            <div id="recommendations"></div>
+        </div>
+    </div>
+
+    <button class="fab" onclick="scrollToTop()" title="Scroll to top">
+        ↑
+    </button>
+
+    <div class="snackbar" id="snackbar"></div>
+
+    <script>
+        const YOUTUBE_API_KEY = 'AIzaSyCIRHDP5IxjlL3q2r9LXp3_7TFJPY6NumY'; 
+        const COURSERA_API_URL = 'https://api.coursera.org/api/courses.v1/courses';
+        
+        const fallbackResources = {
+            math: {
+                low: [
+                    { title: "Khan Academy - Basic Math", url: "https://www.khanacademy.org/math/basic-math", type: "Interactive" },
+                    { title: "Professor Leonard - Algebra", url: "https://www.youtube.com/c/ProfessorLeonard", type: "Video" },
+                    { title: "Mathway Problem Solver", url: "https://www.mathway.com/", type: "Tool" }
+                ],
+                med: [
+                    { title: "Khan Academy - Algebra", url: "https://www.khanacademy.org/math/algebra", type: "Interactive" },
+                    { title: "PatrickJMT Math Videos", url: "https://www.youtube.com/user/patrickJMT", type: "Video" },
+                    { title: "Wolfram Alpha", url: "https://www.wolframalpha.com/", type: "Tool" }
+                ],
+                high: [
+                    { title: "Khan Academy - Calculus", url: "https://www.khanacademy.org/math/calculus-1", type: "Interactive" },
+                    { title: "MIT OpenCourseWare Math", url: "https://ocw.mit.edu/courses/mathematics/", type: "Course" },
+                    { title: "3Blue1Brown", url: "https://www.youtube.com/c/3blue1brown", type: "Video" }
+                ]
+            },
+            science: {
+                low: [
+                    { title: "Khan Academy - Basic Science", url: "https://www.khanacademy.org/science", type: "Interactive" },
+                    { title: "Crash Course Science", url: "https://www.youtube.com/c/crashcourse", type: "Video" },
+                    { title: "NASA Education", url: "https://www.nasa.gov/audience/foreducators/", type: "Resource" }
+                ],
+                med: [
+                    { title: "Khan Academy - Chemistry", url: "https://www.khanacademy.org/science/chemistry", type: "Interactive" },
+                    { title: "MIT OpenCourseWare Science", url: "https://ocw.mit.edu/courses/find-by-topic/", type: "Course" },
+                    { title: "Coursera Science Courses", url: "https://www.coursera.org/browse/physical-science-engineering", type: "Course" }
+                ],
+                high: [
+                    { title: "edX Science Courses", url: "https://www.edx.org/course/subject/science", type: "Course" },
+                    { title: "Khan Academy - AP Physics", url: "https://www.khanacademy.org/science/ap-physics-1", type: "Interactive" },
+                    { title: "Feynman Lectures", url: "https://www.feynmanlectures.caltech.edu/", type: "Resource" }
+                ]
+            },
+            english: {
+                low: [
+                    { title: "Khan Academy - Grammar", url: "https://www.khanacademy.org/humanities/grammar", type: "Interactive" },
+                    { title: "Purdue OWL Writing Lab", url: "https://owl.purdue.edu/owl/purdue_owl.html", type: "Resource" },
+                    { title: "Grammarly Blog", url: "https://www.grammarly.com/blog/", type: "Resource" }
+                ],
+                med: [
+                    { title: "Khan Academy - Reading", url: "https://www.khanacademy.org/humanities/reading-comprehension", type: "Interactive" },
+                    { title: "Coursera Writing Courses", url: "https://www.coursera.org/browse/language-learning/learning-english", type: "Course" },
+                    { title: "TED-Ed Literature", url: "https://ed.ted.com/lessons?category=literature-language-arts", type: "Video" }
+                ],
+                high: [
+                    { title: "Yale Open Courses Literature", url: "https://oyc.yale.edu/english", type: "Course" },
+                    { title: "MIT Writing Course", url: "https://ocw.mit.edu/courses/comparative-media-studies-writing/", type: "Course" },
+                    { title: "Project Gutenberg", url: "https://www.gutenberg.org/", type: "Resource" }
+                ]
+            },
+            history: {
+                low: [
+                    { title: "Khan Academy - World History", url: "https://www.khanacademy.org/humanities/world-history", type: "Interactive" },
+                    { title: "Crash Course World History", url: "https://www.youtube.com/playlist?list=PLBDA2E52FB1EF80C9", type: "Video" },
+                    { title: "BBC History for Kids", url: "https://www.bbc.co.uk/bitesize/subjects/zk26n39", type: "Interactive" }
+                ],
+                med: [
+                    { title: "Khan Academy - US History", url: "https://www.khanacademy.org/humanities/us-history", type: "Interactive" },
+                    { title: "Stanford History Education", url: "https://sheg.stanford.edu/", type: "Resource" },
+                    { title: "Coursera History Courses", url: "https://www.coursera.org/browse/arts-and-humanities/history", type: "Course" }
+                ],
+                high: [
+                    { title: "Yale Open Courses History", url: "https://oyc.yale.edu/history", type: "Course" },
+                    { title: "MIT History Courses", url: "https://ocw.mit.edu/courses/history/", type: "Course" },
+                    { title: "Library of Congress", url: "https://www.loc.gov/teachers/", type: "Resource" }
+                ]
+            }
+        };
+
+        async function fetchYouTubeVideos(subject, level) {
+            try {
+                const searchQueries = {
+                    math: level === 'low' ? 'basic math tutorial' : level === 'med' ? 'algebra tutorial' : 'calculus tutorial',
+                    science: level === 'low' ? 'basic science tutorial' : level === 'med' ? 'chemistry physics tutorial' : 'advanced science tutorial',
+                    english: level === 'low' ? 'english grammar basics' : level === 'med' ? 'english literature tutorial' : 'advanced english writing',
+                    history: level === 'low' ? 'world history basics' : level === 'med' ? 'us history tutorial' : 'advanced history analysis'
+                };
+
+                const query = searchQueries[subject];
+                // Note: In a real implementation, you'd use a proper YouTube API key
+                // For demo purposes, we'll return fallback data
+                return fallbackResources[subject][level].filter(r => r.type === 'Video');
+            } catch (error) {
+                console.error('YouTube API error:', error);
+                return fallbackResources[subject][level].filter(r => r.type === 'Video');
+            }
+        }
+
+        async function fetchCourseraResults(subject, level) {
+            try {
+                // Note: Coursera API requires authentication
+                // For demo purposes, we'll return fallback data
+                return fallbackResources[subject][level].filter(r => r.type === 'Course');
+            } catch (error) {
+                console.error('Coursera API error:', error);
+                return fallbackResources[subject][level].filter(r => r.type === 'Course');
+            }
+        }
+
+        async function fetchKhanAcademyContent(subject, level) {
+            try {
+                // Khan Academy API is read-only and requires specific endpoints
+                // For demo purposes, we'll return fallback data
+                return fallbackResources[subject][level].filter(r => r.type === 'Interactive');
+            } catch (error) {
+                console.error('Khan Academy API error:', error);
+                return fallbackResources[subject][level].filter(r => r.type === 'Interactive');
+            }
+        }
+
+        async function generateRecommendations() {
+            const grades = {
+                math: parseInt(document.getElementById('math').value) || 0,
+                science: parseInt(document.getElementById('science').value) || 0,
+                english: parseInt(document.getElementById('english').value) || 0,
+                history: parseInt(document.getElementById('history').value) || 0
+            };
+
+            const gradeLevel = document.getElementById('gradeLevel').value;
+            const studyTime = parseFloat(document.getElementById('studyTime').value) || 1;
+
+            // Validate inputs
+            if (Object.values(grades).every(grade => grade === 0)) {
+                showSnackbar('Please enter at least one grade');
+                return;
+            }
+
+            // Show loading state
+            document.getElementById('generateBtn').disabled = true;
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('results').style.display = 'none';
+
+            try {
+                const recommendations = [];
+
+                for (const [subject, grade] of Object.entries(grades)) {
+                    if (grade === 0) continue;
+
+                    let priority, level, message;
+
+                    if (grade < 70) {
+                        priority = 'high';
+                        level = 'low';
+                        message = `🚨 URGENT: ${subject.charAt(0).toUpperCase() + subject.slice(1)} needs immediate attention`;
+                    } else if (grade < 85) {
+                        priority = 'med';
+                        level = 'med';
+                        message = `⚠️ IMPROVE: ${subject.charAt(0).toUpperCase() + subject.slice(1)} has room for growth`;
+                    } else {
+                        priority = 'low';
+                        level = 'high';
+                        message = `✅ EXCEL: ${subject.charAt(0).toUpperCase() + subject.slice(1)} is strong - challenge yourself`;
+                    }
+
+                    // Fetch resources from multiple APIs
+                    const [youtubeVideos, courseraResults, khanContent] = await Promise.all([
+                        fetchYouTubeVideos(subject, level),
+                        fetchCourseraResults(subject, level),
+                        fetchKhanAcademyContent(subject, level)
+                    ]);
+
+                    const allResources = [
+                        ...youtubeVideos,
+                        ...courseraResults,
+                        ...khanContent,
+                        ...fallbackResources[subject][level].filter(r => !['Video', 'Course', 'Interactive'].includes(r.type))
+                    ];
+
+                    recommendations.push({
+                        subject,
+                        grade,
+                        priority,
+                        level,
+                        message,
+                        resources: allResources.slice(0, 6) // Limit to 6 resources per subject
+                    });
+                }
+
+                // Sort by priority
+                recommendations.sort((a, b) => {
+                    const priorityOrder = { 'high': 3, 'med': 2, 'low': 1 };
+                    return priorityOrder[b.priority] - priorityOrder[a.priority];
+                });
+
+                await displayResults(recommendations, grades, studyTime);
+                showSnackbar('Study plan generated successfully!');
+
+            } catch (error) {
+                console.error('Error generating recommendations:', error);
+                showSnackbar('Error generating recommendations. Please try again.');
+            } finally {
+                document.getElementById('generateBtn').disabled = false;
+                document.getElementById('loading').style.display = 'none';
+            }
+        }
+
+        async function displayResults(recommendations, grades, studyTime) {
+            const resultsDiv = document.getElementById('results');
+            const statsGrid = document.getElementById('statsGrid');
+            const recommendationsDiv = document.getElementById('recommendations');
+
+            // Calculate stats
+            const validGrades = Object.values(grades).filter(grade => grade > 0);
+            const average = validGrades.reduce((a, b) => a + b, 0) / validGrades.length;
+            const lowest = Math.min(...validGrades);
+            const highest = Math.max(...validGrades);
+
+            // Display stats with progress bars
+            statsGrid.innerHTML = `
+                <div class="stat-card">
+                    <div class="stat-value">${average.toFixed(1)}%</div>
+                    <div class="stat-label">Average Grade</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: ${average}%"></div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">${lowest}%</div>
+                    <div class="stat-label">Lowest Grade</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: ${lowest}%"></div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">${highest}%</div>
+                    <div class="stat-label">Highest Grade</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: ${highest}%"></div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">${studyTime}h</div>
+                    <div class="stat-label">Daily Study Time</div>
+                </div>
+            `;
+
+            // Display recommendations
+            recommendationsDiv.innerHTML = recommendations.map(rec => `
+                <div class="recommendation-card">
+                    <div class="rec-header priority-${rec.priority}">
+                        <h3>${rec.message}</h3>
+                        <p>Current Grade: ${rec.grade}% | Priority: ${rec.priority.toUpperCase()}</p>
+                    </div>
+                    <div class="rec-content">
+                        <p><strong>📚 Recommended Resources:</strong></p>
+                        <div class="resource-chips">
+                            ${rec.resources.map(resource => 
+                                `<a href="${resource.url}" target="_blank" class="chip" title="${resource.type}">${resource.title}</a>`
+                            ).join('')}
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+
+            resultsDiv.style.display = 'block';
+            resultsDiv.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function showSnackbar(message) {
+            const snackbar = document.getElementById('snackbar');
+            snackbar.textContent = message;
+            snackbar.classList.add('show');
+            
+            setTimeout(() => {
+                snackbar.classList.remove('show');
+            }, 3000);
+        }
+
+        function scrollToTop() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Initialize form validation
+        document.addEventListener('DOMContentLoaded', function() {
+            const inputs = document.querySelectorAll('.input-field');
+            inputs.forEach(input => {
+                input.addEventListener('input', function() {
+                    if (this.value) {
+                        this.classList.add('has-value');
+                    } else {
+                        this.classList.remove('has-value');
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
